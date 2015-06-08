@@ -4,18 +4,18 @@ This SQLite extension implements functions for creating [RFC 4122](https://www.i
 
 ## Installation
 
-1. Install the SQLite development headers. Mac OS X ships with SQLite and the development headers, but you may need to install them on Linux.
+1. Install the necessary development headers. Mac OS X ships with SQLite and the development headers, but you may need to install them on Linux.
 
     * Debian / Ubuntu:
 
         ```
-        sudo apt-get install libsqlite3-dev
+        sudo apt-get install libsqlite3-dev uuid-dev
         ```
 
     * Red Hat / CentOS:
 
         ```
-        sudo yum install sqlite-devel
+        sudo yum install sqlite-devel uuid-devel
         ```
 
 2. Build the extension. The build will produce a shared library for your platform under `dist/`.
@@ -40,6 +40,15 @@ This SQLite extension implements functions for creating [RFC 4122](https://www.i
     ```
 
 ## Usage
+
+### `uuid1()`
+
+Generate a version 1 UUID, based on the time and host machine's MAC address.
+
+```sql
+SELECT uuid1();
+d5a80b20-0d8f-11e5-b8cb-080027b6ec40
+```
 
 ### `uuid4()`
 
