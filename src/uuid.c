@@ -30,7 +30,7 @@ static void uuid1func(
   uuid_generate_time(uuid);
   char uuid_str[37];
   uuid_unparse_lower(uuid, uuid_str);
-  sqlite3_result_text(context, uuid_str, 37, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
 }
 
 /*
@@ -46,7 +46,7 @@ static void uuid4func(
   uuid_generate_random(uuid);
   char uuid_str[37];
   uuid_unparse_lower(uuid, uuid_str);
-  sqlite3_result_text(context, uuid_str, 37, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
 }
 
 /*
