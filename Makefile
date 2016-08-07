@@ -3,7 +3,7 @@
 NAME	  = uuid
 VERSION  := $(shell git describe --always --dirty --match v* | sed 's/^v//')
 PLATFORM := $(shell uname -s)
-CFLAGS    = -g -fPIC -Wall -Wextra -O2
+CFLAGS    = -g -fPIC -Wall -Wextra -O2 -lcrypto
 LDFLAGS   = -shared
 DIST_DIR  = dist
 SOURCES  := $(wildcard src/*.c)

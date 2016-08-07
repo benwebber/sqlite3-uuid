@@ -9,13 +9,13 @@ This SQLite extension implements functions for creating [RFC 4122](https://www.i
     * Debian / Ubuntu:
 
         ```
-        sudo apt-get install libsqlite3-dev uuid-dev
+        sudo apt-get install libsqlite3-dev libssl-dev uuid-dev
         ```
 
     * Red Hat / CentOS:
 
         ```
-        sudo yum install sqlite-devel uuid-devel
+        sudo yum install openssl-devel sqlite-devel uuid-devel
         ```
 
 2. Build the extension. The build will produce a shared library for your platform under `dist/`.
@@ -50,6 +50,15 @@ SELECT uuid1();
 d5a80b20-0d8f-11e5-b8cb-080027b6ec40
 ```
 
+### `uuid3()`
+
+Generate a version 3 (MD5) namespace UUID.
+
+```
+SELECT uuid3(uuid_ns_dns(), 'example.org');
+04738bdf-b25a-3829-a801-b21a1d25095b
+```
+
 ### `uuid4()`
 
 Generate a version 4 (random) UUID.
@@ -57,6 +66,45 @@ Generate a version 4 (random) UUID.
 ```sql
 SELECT uuid4();
 1e607604-f360-4fa5-863a-bc91adc70bb9
+```
+
+### `uuid5()`
+
+Generate a version 5 (SHA1) namespace UUID.
+
+```
+SELECT uuid3(uuid_ns_dns(), 'example.org');
+aad03681-8b63-5304-89e0-8ca8f49461b5
+```
+
+### Namespaces
+
+#### DNS
+
+```
+SELECT uuid_ns_dns();
+6ba7b810-9dad-11d1-80b4-00c04fd430c8
+```
+
+#### OID
+
+```
+SELECT uuid_ns_oid();
+6ba7b812-9dad-11d1-80b4-00c04fd430c8
+```
+
+#### URL
+
+```
+SELECT uuid_ns_url();
+6ba7b811-9dad-11d1-80b4-00c04fd430c8
+```
+
+#### X500
+
+```
+SELECT uuid_ns_x500();
+6ba7b814-9dad-11d1-80b4-00c04fd430c8
 ```
 
 ## Notes
