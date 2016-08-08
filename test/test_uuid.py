@@ -5,15 +5,15 @@ sqlite-uuid test suite
 """
 
 import collections
-import os.path
 import uuid
-
-import pytest
 
 try:
     from pysqlite2 import dbapi2 as sqlite3
 except ImportError:
     import sqlite3
+
+import pytest
+
 
 NamespaceExample = collections.namedtuple('NamespaceExample', ['namespace', 'name'])
 
@@ -60,32 +60,34 @@ def test_uuid1(db):
     result = query(db, 'SELECT uuid1();')
     u = uuid.UUID(result)
     assert u.version == 1
-    assert u.variant == 'specified in RFC 4122'
+    assert u.variant == uuid.RFC_4122
 
 
 def test_uuid3(db, uuid3_examples):
     for example in uuid3_examples:
-        result = query(db, 'SELECT uuid3(?, ?);', example[0])
+        args, expected = example
+        result = query(db, 'SELECT uuid3(?, ?);', args)
         u = uuid.UUID(result)
-        assert u == example[1]
+        assert u == expected
         assert u.version == 3
-        assert u.variant == 'specified in RFC 4122'
+        assert u.variant == uuid.RFC_4122
 
 
 def test_uuid4(db):
-    result = db.execute('SELECT uuid4();').fetchone()[0]
+    result = query(db, 'SELECT uuid4();')
     u = uuid.UUID(result)
     assert u.version == 4
-    assert u.variant == 'specified in RFC 4122'
+    assert u.variant == uuid.RFC_4122
 
 
 def test_uuid5(db, uuid5_examples):
     for example in uuid5_examples:
-        result = query(db, 'SELECT uuid5(?, ?);', example[0])
+        args, expected = example
+        result = query(db, 'SELECT uuid5(?, ?);', args)
         u = uuid.UUID(result)
-        assert u == example[1]
+        assert u == expected
         assert u.version == 5
-        assert u.variant == 'specified in RFC 4122'
+        assert u.variant == uuid.RFC_4122
 
 
 def test_uuid_ns_dns(db):
