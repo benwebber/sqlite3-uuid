@@ -1,0 +1,11 @@
+language: python
+addons:
+  apt:
+    packages:
+      - gcc
+      - libssl-dev
+      - libsqlite3-dev
+      - uuid-dev
+script: make test
+notifications:
+  email: false
