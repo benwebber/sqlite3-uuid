@@ -1,7 +1,7 @@
 .PHONY: all clean test
 
 NAME	  = uuid
-VERSION  := $(shell git describe --always --dirty --match v* | sed 's/^v//')
+VERSION  := $(shell git describe --tags --always --dirty --match v* | sed 's/^v//')
 PLATFORM := $(shell uname -s)
 CFLAGS    = -g -fPIC -Wall -Wextra -Wno-unused-parameter -O2 -lcrypto
 LDFLAGS   = -shared
