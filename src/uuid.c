@@ -69,7 +69,7 @@ static void uuid_v3_or_v5(
   set_variant(md_value);
   set_version(md_value, version);
 
-  strncpy(uu, md_value, 16);
+  memcpy(uu, md_value, 16);
 }
 
 /*
