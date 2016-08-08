@@ -47,7 +47,6 @@ static void uuid_v3_or_v5(
   EVP_MD_CTX mdctx;
   const EVP_MD *md;
   unsigned char md_value[EVP_MAX_MD_SIZE];
-  int md_len;
 
   switch(version)
   {
@@ -63,7 +62,7 @@ static void uuid_v3_or_v5(
   EVP_DigestInit_ex(&mdctx, md, NULL);
   EVP_DigestUpdate(&mdctx, namespace, 16);
   EVP_DigestUpdate(&mdctx, name, strlen((const char *)name));
-  EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
+  EVP_DigestFinal_ex(&mdctx, md_value, NULL);
   EVP_MD_CTX_cleanup(&mdctx);
 
   set_variant(md_value);
