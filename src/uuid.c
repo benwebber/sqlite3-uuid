@@ -155,6 +155,7 @@ static void uuid_ns_dns(
   int argc,
   sqlite3_value **argv
 ){
+  assert(argc==0);
   char uuid_str[37];
   uuid_unparse_lower(NAMESPACE_DNS, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
@@ -165,6 +166,7 @@ static void uuid_ns_oid(
   int argc,
   sqlite3_value **argv
 ){
+  assert(argc==0);
   char uuid_str[37];
   uuid_unparse_lower(NAMESPACE_OID, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
@@ -175,6 +177,7 @@ static void uuid_ns_url(
   int argc,
   sqlite3_value **argv
 ){
+  assert(argc==0);
   char uuid_str[37];
   uuid_unparse_lower(NAMESPACE_URL, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
@@ -185,6 +188,7 @@ static void uuid_ns_x500(
   int argc,
   sqlite3_value **argv
 ){
+  assert(argc==0);
   char uuid_str[37];
   uuid_unparse_lower(NAMESPACE_X500, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
