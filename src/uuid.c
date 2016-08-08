@@ -15,9 +15,16 @@
 #include <sqlite3ext.h>
 SQLITE_EXTENSION_INIT1
 #include <assert.h>
-#include <openssl/evp.h>
 #include <uuid/uuid.h>
 #include <string.h>
+
+#ifdef USE_OPENSSL
+#include <openssl/evp.h>
+#endif
+
+#ifdef USE_COMMONCRYPTO
+#include <CommonCrypto/CommonCrypto.h>
+#endif
 
 const uuid_t NAMESPACE_DNS  = {0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
 const uuid_t NAMESPACE_OID  = {0x6b,0xa7,0xb8,0x12,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
@@ -44,6 +51,7 @@ static void uuid_v3_or_v5(
   const unsigned char *name,
   uuid_t uu
 ){
+  #ifdef USE_OPENSSL
   EVP_MD_CTX mdctx;
   const EVP_MD *md;
   unsigned char md_value[EVP_MAX_MD_SIZE];
@@ -69,6 +77,43 @@ static void uuid_v3_or_v5(
   set_version(md_value, version);
 
   memcpy(uu, md_value, 16);
+  #endif
+
+  #ifdef USE_COMMONCRYPTO
+  switch(version)
+  {
+    case 3:
+    {
+      CC_MD5_CTX mdctx;
+      unsigned char md_value[CC_MD5_DIGEST_LENGTH];
+      CC_MD5_Init(&mdctx);
+      CC_MD5_Update(&mdctx, namespace, 16);
+      CC_MD5_Update(&mdctx, name, strlen((const char *)name));
+      CC_MD5_Final(md_value, &mdctx);
+
+      set_variant(md_value);
+      set_version(md_value, version);
+
+      memcpy(uu, md_value, 16);
+      break;
+    }
+    case 5:
+    {
+      CC_SHA1_CTX mdctx;
+      unsigned char md_value[CC_SHA1_DIGEST_LENGTH];
+      CC_SHA1_Init(&mdctx);
+      CC_SHA1_Update(&mdctx, namespace, 16);
+      CC_SHA1_Update(&mdctx, name, strlen((const char *)name));
+      CC_SHA1_Final(md_value, &mdctx);
+
+      set_variant(md_value);
+      set_version(md_value, version);
+
+      memcpy(uu, md_value, 16);
+      break;
+    }
+  }
+  #endif
 }
 
 /*
@@ -237,6 +282,8 @@ int sqlite3_extension_init(
   const sqlite3_api_routines *pApi
 ){
   SQLITE_EXTENSION_INIT2(pApi);
+  #ifdef USE_OPENSSL
   OpenSSL_add_all_digests();
+  #endif
   return register_uuid_functions(db);
 }
