@@ -6,11 +6,14 @@ sqlite-uuid test suite
 
 import collections
 import os.path
-import sqlite3
 import uuid
 
 import pytest
 
+try:
+    from pysqlite2 import dbapi2 as sqlite3
+except ImportError:
+    import sqlite3
 
 NamespaceExample = collections.namedtuple('NamespaceExample', ['namespace', 'name'])
 
