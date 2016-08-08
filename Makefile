@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean test
 
 NAME	  = uuid
 VERSION  := $(shell git describe --always --dirty --match v* | sed 's/^v//')
@@ -15,7 +15,9 @@ else
 	LDFLAGS += -luuid
 endif
 
-all: $(DIST_DIR)/$(NAME)-$(VERSION).$(SO_EXT)
+LIB := $(DIST_DIR)/$(NAME)-$(VERSION).$(SO_EXT)
+
+all: $(LIB)
 
 clean:
 	$(RM) -r $(DIST_DIR)
@@ -23,6 +25,9 @@ clean:
 print-%:
 	@echo '$*=$($*)'
 
-$(DIST_DIR)/$(NAME)-$(VERSION).$(SO_EXT): $(SOURCES)
+test: $(LIB)
+	py.test --extension=$(LIB)
+
+$(LIB): $(SOURCES)
 	mkdir -p $(DIST_DIR)
 	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
