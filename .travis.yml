@@ -1,7 +1,12 @@
 language: python
-os:
-  - linux
-  - osx
+
+matrix:
+  include:
+    - os: linux
+      language: python
+    - os: osx
+      language: generic
+
 addons:
   apt:
     packages:
@@ -9,6 +14,17 @@ addons:
       - libssl-dev
       - libsqlite3-dev
       - uuid-dev
+
+before_install:
+  - "[[ $TRAVIS_OS_NAME == 'osx' ]] && brew update"
+  - "[[ $TRAVIS_OS_NAME == 'osx' ]] && brew install python"
+  - "[[ $TRAVIS_OS_NAME == 'osx' ]] && virtualenv venv"
+  - "[[ $TRAVIS_OS_NAME == 'osx' ]] && . ./venv/bin/activate"
+
+install:
+  - "[[ $TRAVIS_OS_NAME == 'osx' ]] && pip install -r requirements.txt"
+
 script: make test
+
 notifications:
   email: false

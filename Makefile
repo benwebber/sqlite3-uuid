@@ -36,7 +36,7 @@ print-%:
 	@echo '$*=$($*)'
 
 test: $(LIB)
-	py.test --extension=$(LIB)
+	py.test --ignore venv --extension=$(LIB)
 
 $(LIB): $(SOURCES)
 	mkdir -p $(DIST_DIR)
