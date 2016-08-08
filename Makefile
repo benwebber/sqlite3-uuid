@@ -3,13 +3,14 @@
 NAME	  = uuid
 VERSION  := $(shell git describe --always --dirty --match v* | sed 's/^v//')
 PLATFORM := $(shell uname -s)
-CFLAGS    = -g -fPIC -Wall -Wextra -O2 -lcrypto
+CFLAGS    = -g -fPIC -Wall -Wextra -Wno-unused-parameter -O2 -lcrypto
 LDFLAGS   = -shared
 DIST_DIR  = dist
 SOURCES  := $(wildcard src/*.c)
 
 ifeq ($(PLATFORM), Darwin)
 	SO_EXT = dylib
+	CFLAGS := $(CFLAGS) -Wno-deprecated-declarations
 else
 	SO_EXT   = so
 	LDFLAGS += -luuid
