@@ -194,6 +194,18 @@ static void uuid5func(
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
 }
 
+static void uuid_nil(
+  sqlite3_context *context,
+  int argc,
+  sqlite3_value **argv
+){
+  assert(argc==0);
+  uuid_t uu = {0};
+  char uuid_str[37];
+  uuid_unparse_lower(uu, uuid_str);
+  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+}
+
 static void uuid_ns_dns(
   sqlite3_context *context,
   int argc,
@@ -254,6 +266,7 @@ int register_uuid_functions(sqlite3 *db) {
     {"uuid3",        2, SQLITE_UTF8, uuid3func},
     {"uuid4",        0, SQLITE_UTF8, uuid4func},
     {"uuid5",        2, SQLITE_UTF8, uuid5func},
+    {"uuid_nil",     0, SQLITE_UTF8, uuid_nil},
     {"uuid_ns_dns",  0, SQLITE_UTF8, uuid_ns_dns},
     {"uuid_ns_oid",  0, SQLITE_UTF8, uuid_ns_oid},
     {"uuid_ns_url",  0, SQLITE_UTF8, uuid_ns_url},

@@ -90,6 +90,13 @@ def test_uuid5(db, uuid5_examples):
         assert u.variant == uuid.RFC_4122
 
 
+def test_uuid_nil(db):
+    result = query(db, 'SELECT uuid_nil();')
+    u = uuid.UUID(result)
+    assert u == uuid.UUID('00000000-0000-0000-0000-000000000000')
+    assert u.variant == uuid.RESERVED_NCS
+
+
 def test_uuid_ns_dns(db):
     result = query(db, 'SELECT uuid_ns_dns();')
     u = uuid.UUID(result)

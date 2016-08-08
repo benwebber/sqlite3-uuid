@@ -79,6 +79,15 @@ SELECT uuid3(uuid_ns_dns(), 'example.org');
 aad03681-8b63-5304-89e0-8ca8f49461b5
 ```
 
+### `uuid_nil()`
+
+Generate the nil UUID.
+
+```
+SELECT uuid_nil();
+00000000-0000-0000-0000-000000000000
+```
+
 ### Namespaces
 
 #### DNS
