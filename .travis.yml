@@ -24,7 +24,9 @@ before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then . ./venv/bin/activate; fi
 
 install:
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pip install -r requirements.txt; fi
+  # Required for OS X. Not restricted by TRAVIS_OS_NAME because including an
+  # `install` section overrides the implicit `pip install` on Linux.
+  - pip install -r requirements.txt
 
 script: make test
 
