@@ -19,11 +19,13 @@ SQLITE_EXTENSION_INIT1
 #include <string.h>
 
 #ifdef USE_OPENSSL
-#include <openssl/evp.h>
+#include <openssl/md5.h>
+#include <openssl/sha.h>
 #endif
 
 #ifdef USE_COMMONCRYPTO
-#include <CommonCrypto/CommonCrypto.h>
+#define COMMON_DIGEST_FOR_OPENSSL
+#include <CommonCrypto/CommonDigest.h>
 #endif
 
 const uuid_t NAMESPACE_DNS  = {0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
@@ -43,77 +45,6 @@ static void set_version(
   int version
 ){
   uu[6] = (uu[6] & 0x0f) | (version << 4);
-}
-
-static void uuid_v3_or_v5(
-  int version,
-  uuid_t namespace,
-  const unsigned char *name,
-  uuid_t uu
-){
-  #ifdef USE_OPENSSL
-  EVP_MD_CTX mdctx;
-  const EVP_MD *md;
-  unsigned char md_value[EVP_MAX_MD_SIZE];
-
-  switch(version)
-  {
-    case 3:
-      md = EVP_get_digestbyname("MD5");
-      break;
-    case 5:
-      md = EVP_get_digestbyname("SHA1");
-      break;
-  }
-
-  EVP_MD_CTX_init(&mdctx);
-  EVP_DigestInit_ex(&mdctx, md, NULL);
-  EVP_DigestUpdate(&mdctx, namespace, 16);
-  EVP_DigestUpdate(&mdctx, name, strlen((const char *)name));
-  EVP_DigestFinal_ex(&mdctx, md_value, NULL);
-  EVP_MD_CTX_cleanup(&mdctx);
-
-  set_variant(md_value);
-  set_version(md_value, version);
-
-  memcpy(uu, md_value, 16);
-  #endif
-
-  #ifdef USE_COMMONCRYPTO
-  switch(version)
-  {
-    case 3:
-    {
-      CC_MD5_CTX mdctx;
-      unsigned char md_value[CC_MD5_DIGEST_LENGTH];
-      CC_MD5_Init(&mdctx);
-      CC_MD5_Update(&mdctx, namespace, 16);
-      CC_MD5_Update(&mdctx, name, strlen((const char *)name));
-      CC_MD5_Final(md_value, &mdctx);
-
-      set_variant(md_value);
-      set_version(md_value, version);
-
-      memcpy(uu, md_value, 16);
-      break;
-    }
-    case 5:
-    {
-      CC_SHA1_CTX mdctx;
-      unsigned char md_value[CC_SHA1_DIGEST_LENGTH];
-      CC_SHA1_Init(&mdctx);
-      CC_SHA1_Update(&mdctx, namespace, 16);
-      CC_SHA1_Update(&mdctx, name, strlen((const char *)name));
-      CC_SHA1_Final(md_value, &mdctx);
-
-      set_variant(md_value);
-      set_version(md_value, version);
-
-      memcpy(uu, md_value, 16);
-      break;
-    }
-  }
-  #endif
 }
 
 /*
@@ -141,16 +72,28 @@ static void uuid3func(
   sqlite3_value **argv
 ){
   assert(argc==2);
-  uuid_t ns_uuid;
+  uuid_t namespace_uuid;
   char uuid_str[37];
 
-  const unsigned char *ns    = sqlite3_value_text(argv[0]);
-  const unsigned char *input = sqlite3_value_text(argv[1]);
+  const unsigned char *namespace = sqlite3_value_text(argv[0]);
+  const unsigned char *name      = sqlite3_value_text(argv[1]);
 
-  uuid_parse((const char *)ns, ns_uuid);
+  uuid_parse((const char *)namespace, namespace_uuid);
 
   uuid_t uu;
-  uuid_v3_or_v5(3, ns_uuid, input, uu);
+
+  MD5_CTX mdctx;
+  unsigned char md_value[MD5_DIGEST_LENGTH];
+  MD5_Init(&mdctx);
+  MD5_Update(&mdctx, namespace_uuid, 16);
+  MD5_Update(&mdctx, name, strlen((const char *)name));
+  MD5_Final(md_value, &mdctx);
+
+  set_variant(md_value);
+  set_version(md_value, 3);
+
+  memcpy(uu, md_value, 16);
+
   uuid_unparse_lower(uu, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
 }
@@ -180,16 +123,28 @@ static void uuid5func(
   sqlite3_value **argv
 ){
   assert(argc==2);
-  uuid_t ns_uuid;
+  uuid_t namespace_uuid;
   char uuid_str[37];
 
-  const unsigned char *ns    = sqlite3_value_text(argv[0]);
-  const unsigned char *input = sqlite3_value_text(argv[1]);
+  const unsigned char *namespace = sqlite3_value_text(argv[0]);
+  const unsigned char *name      = sqlite3_value_text(argv[1]);
 
-  uuid_parse((const char *)ns, ns_uuid);
+  uuid_parse((const char *)namespace, namespace_uuid);
 
   uuid_t uu;
-  uuid_v3_or_v5(5, ns_uuid, input, uu);
+
+  SHA_CTX mdctx;
+  unsigned char md_value[SHA_DIGEST_LENGTH];
+  SHA1_Init(&mdctx);
+  SHA1_Update(&mdctx, namespace_uuid, 16);
+  SHA1_Update(&mdctx, name, strlen((const char *)name));
+  SHA1_Final(md_value, &mdctx);
+
+  set_variant(md_value);
+  set_version(md_value, 5);
+
+  memcpy(uu, md_value, 16);
+
   uuid_unparse_lower(uu, uuid_str);
   sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
 }
@@ -295,8 +250,5 @@ int sqlite3_extension_init(
   const sqlite3_api_routines *pApi
 ){
   SQLITE_EXTENSION_INIT2(pApi);
-  #ifdef USE_OPENSSL
-  OpenSSL_add_all_digests();
-  #endif
   return register_uuid_functions(db);
 }
