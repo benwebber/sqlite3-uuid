@@ -28,12 +28,6 @@ SQLITE_EXTENSION_INIT1
 #include <CommonCrypto/CommonDigest.h>
 #endif
 
-const uuid_t NAMESPACE_DNS  = {0x6b,0xa7,0xb8,0x10,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
-const uuid_t NAMESPACE_OID  = {0x6b,0xa7,0xb8,0x12,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
-const uuid_t NAMESPACE_URL  = {0x6b,0xa7,0xb8,0x11,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
-const uuid_t NAMESPACE_X500 = {0x6b,0xa7,0xb8,0x14,0x9d,0xad,0x11,0xd1,0x80,0xb4,0x00,0xc0,0x4f,0xd4,0x30,0xc8};
-
-
 static void set_variant(
   uuid_t uu
 ){
@@ -157,10 +151,7 @@ static void uuid_nil(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  uuid_t uu = {0};
-  char uuid_str[37];
-  uuid_unparse_lower(uu, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", 36, SQLITE_TRANSIENT);
 }
 
 static void uuid_ns_dns(
@@ -169,9 +160,7 @@ static void uuid_ns_dns(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  char uuid_str[37];
-  uuid_unparse_lower(NAMESPACE_DNS, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
 }
 
 static void uuid_ns_oid(
@@ -180,9 +169,7 @@ static void uuid_ns_oid(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  char uuid_str[37];
-  uuid_unparse_lower(NAMESPACE_OID, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
 }
 
 static void uuid_ns_url(
@@ -191,9 +178,7 @@ static void uuid_ns_url(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  char uuid_str[37];
-  uuid_unparse_lower(NAMESPACE_URL, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
 }
 
 static void uuid_ns_x500(
@@ -202,15 +187,13 @@ static void uuid_ns_x500(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  char uuid_str[37];
-  uuid_unparse_lower(NAMESPACE_X500, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
 }
 
 /*
 ** Register UUID functions to database `db`.
 */
-int register_uuid_functions(sqlite3 *db) {
+static int register_uuid_functions(sqlite3 *db) {
   typedef struct UUIDScalar {
     const char *name;
     int argc;
