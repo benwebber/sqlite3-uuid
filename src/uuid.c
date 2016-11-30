@@ -72,8 +72,10 @@ static void uuid3func(
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
 
-  if(uuid_parse((const char *)namespace, namespace_uuid) == -1)
-    sqlite3_result_error(context, "invalid uuid", SQLITE_ERROR);
+  if(uuid_parse((const char *)namespace, namespace_uuid) == -1) {
+    sqlite3_result_error(context, "invalid uuid", -1);
+    return;
+  }
 
   uuid_t uu;
 
@@ -124,8 +126,10 @@ static void uuid5func(
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
 
-  if(uuid_parse((const char *)namespace, namespace_uuid) == -1)
-    sqlite3_result_error(context, "invalid uuid", SQLITE_ERROR);
+  if(uuid_parse((const char *)namespace, namespace_uuid) == -1) {
+    sqlite3_result_error(context, "invalid uuid", -1);
+    return;
+  }
 
   uuid_t uu;
 
