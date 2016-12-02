@@ -45,7 +45,7 @@ static void uuid1func(
   assert(argc==0);
   uuid_t uuid;
   uuid_generate_time(uuid);
-  char uuid_str[37];
+  uuid_string_t uuid_str;
   uuid_unparse_lower(uuid, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
@@ -60,7 +60,7 @@ static void uuid3func(
 ){
   assert(argc==2);
   uuid_t namespace_uuid;
-  char uuid_str[37];
+  uuid_string_t uuid_str;
 
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
@@ -99,7 +99,7 @@ static void uuid4func(
   assert(argc==0);
   uuid_t uuid;
   uuid_generate_random(uuid);
-  char uuid_str[37];
+  uuid_string_t uuid_str;
   uuid_unparse_lower(uuid, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
@@ -114,7 +114,7 @@ static void uuid5func(
 ){
   assert(argc==2);
   uuid_t namespace_uuid;
-  char uuid_str[37];
+  uuid_string_t uuid_str;
 
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
