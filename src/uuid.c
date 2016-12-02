@@ -28,18 +28,11 @@ SQLITE_EXTENSION_INIT1
 #include <CommonCrypto/CommonDigest.h>
 #endif
 
-static void set_variant(
-  uuid_t uu
-){
-  uu[8] = (uu[8] & 0xbf) | 0x80;
-}
+#define SET_VARIANT(uu)           (uu[8] = (uu[8] & 0xbf) | 0x80)
+#define SET_VERSION(uu, version)  (uu[6] = (uu[6] & 0x0f) | (version << 4))
 
-static void set_version(
-  uuid_t uu,
-  int version
-){
-  uu[6] = (uu[6] & 0x0f) | (version << 4);
-}
+#define UUID_LENGTH  36
+#define UUID_SIZE    16
 
 /*
 ** Implementation of uuid1() function.
@@ -54,7 +47,7 @@ static void uuid1func(
   uuid_generate_time(uuid);
   char uuid_str[37];
   uuid_unparse_lower(uuid, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
 
 /*
@@ -82,17 +75,17 @@ static void uuid3func(
   MD5_CTX mdctx;
   unsigned char md_value[MD5_DIGEST_LENGTH];
   MD5_Init(&mdctx);
-  MD5_Update(&mdctx, namespace_uuid, 16);
+  MD5_Update(&mdctx, namespace_uuid, UUID_SIZE);
   MD5_Update(&mdctx, name, strlen((const char *)name));
   MD5_Final(md_value, &mdctx);
 
-  set_variant(md_value);
-  set_version(md_value, 3);
+  SET_VARIANT(md_value);
+  SET_VERSION(md_value, 3);
 
-  memcpy(uu, md_value, 16);
+  memcpy(uu, md_value, UUID_SIZE);
 
   uuid_unparse_lower(uu, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
 
 /*
@@ -108,7 +101,7 @@ static void uuid4func(
   uuid_generate_random(uuid);
   char uuid_str[37];
   uuid_unparse_lower(uuid, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
 
 /*
@@ -136,17 +129,17 @@ static void uuid5func(
   SHA_CTX mdctx;
   unsigned char md_value[SHA_DIGEST_LENGTH];
   SHA1_Init(&mdctx);
-  SHA1_Update(&mdctx, namespace_uuid, 16);
+  SHA1_Update(&mdctx, namespace_uuid, UUID_SIZE);
   SHA1_Update(&mdctx, name, strlen((const char *)name));
   SHA1_Final(md_value, &mdctx);
 
-  set_variant(md_value);
-  set_version(md_value, 5);
+  SET_VARIANT(md_value);
+  SET_VERSION(md_value, 5);
 
-  memcpy(uu, md_value, 16);
+  memcpy(uu, md_value, UUID_SIZE);
 
   uuid_unparse_lower(uu, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
 
 static void uuid_nil(
@@ -155,7 +148,7 @@ static void uuid_nil(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", 36, SQLITE_STATIC);
+  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_dns(
@@ -164,7 +157,7 @@ static void uuid_ns_dns(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
+  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_oid(
@@ -173,7 +166,7 @@ static void uuid_ns_oid(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
+  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_url(
@@ -182,7 +175,7 @@ static void uuid_ns_url(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
+  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_x500(
@@ -191,7 +184,7 @@ static void uuid_ns_x500(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
+  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_to_string_func(
@@ -201,13 +194,13 @@ static void uuid_to_string_func(
 ){
   assert(argc==1);
   const void *uuid_bytes = sqlite3_value_blob(argv[0]);
-  if(sqlite3_value_bytes(argv[0]) != 16) {
+  if(sqlite3_value_bytes(argv[0]) != UUID_SIZE) {
     sqlite3_result_error(context, "invalid uuid bytes", -1);
     return;
   }
   uuid_string_t uuid_str;
   uuid_unparse_lower(*(uuid_t *)uuid_bytes, uuid_str);
-  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
 
 static void uuid_to_blob_func(
@@ -222,7 +215,7 @@ static void uuid_to_blob_func(
     sqlite3_result_error(context, "invalid uuid", -1);
     return;
   }
-  sqlite3_result_blob(context, uuid, 16, SQLITE_TRANSIENT);
+  sqlite3_result_blob(context, uuid, UUID_SIZE, SQLITE_TRANSIENT);
 }
 
 /*
