@@ -155,7 +155,7 @@ static void uuid_nil(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", 36, SQLITE_STATIC);
 }
 
 static void uuid_ns_dns(
@@ -164,7 +164,7 @@ static void uuid_ns_dns(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
 }
 
 static void uuid_ns_oid(
@@ -173,7 +173,7 @@ static void uuid_ns_oid(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
 }
 
 static void uuid_ns_url(
@@ -182,7 +182,7 @@ static void uuid_ns_url(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
 }
 
 static void uuid_ns_x500(
@@ -191,7 +191,7 @@ static void uuid_ns_x500(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
+  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_STATIC);
 }
 
 static void uuid_to_string_func(
