@@ -194,6 +194,37 @@ static void uuid_ns_x500(
   sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36, SQLITE_TRANSIENT);
 }
 
+static void uuid_to_string_func(
+  sqlite3_context *context,
+  int argc,
+  sqlite3_value **argv
+){
+  assert(argc==1);
+  const void *uuid_bytes = sqlite3_value_blob(argv[0]);
+  if(sqlite3_value_bytes(argv[0]) != 16) {
+    sqlite3_result_error(context, "invalid uuid bytes", -1);
+    return;
+  }
+  uuid_string_t uuid_str;
+  uuid_unparse_lower(*(uuid_t *)uuid_bytes, uuid_str);
+  sqlite3_result_text(context, uuid_str, 36, SQLITE_TRANSIENT);
+}
+
+static void uuid_to_blob_func(
+  sqlite3_context *context,
+  int argc,
+  sqlite3_value **argv
+){
+  assert(argc==1);
+  uuid_t uuid;
+  const unsigned char *uuid_str	= sqlite3_value_text(argv[0]);
+  if(uuid_parse((const char *)uuid_str, uuid) == -1) {
+    sqlite3_result_error(context, "invalid uuid", -1);
+    return;
+  }
+  sqlite3_result_blob(context, uuid, 16, SQLITE_TRANSIENT);
+}
+
 /*
 ** Register UUID functions to database `db`.
 */
@@ -206,15 +237,17 @@ static int register_uuid_functions(sqlite3 *db) {
   } UUIDScalar;
 
   UUIDScalar scalars[] = {
-    {"uuid1",        0, SQLITE_UTF8, uuid1func},
-    {"uuid3",        2, SQLITE_UTF8, uuid3func},
-    {"uuid4",        0, SQLITE_UTF8, uuid4func},
-    {"uuid5",        2, SQLITE_UTF8, uuid5func},
-    {"uuid_nil",     0, SQLITE_UTF8, uuid_nil},
-    {"uuid_ns_dns",  0, SQLITE_UTF8, uuid_ns_dns},
-    {"uuid_ns_oid",  0, SQLITE_UTF8, uuid_ns_oid},
-    {"uuid_ns_url",  0, SQLITE_UTF8, uuid_ns_url},
-    {"uuid_ns_x500", 0, SQLITE_UTF8, uuid_ns_x500},
+    {"uuid1",          0, SQLITE_UTF8, uuid1func},
+    {"uuid3",          2, SQLITE_UTF8, uuid3func},
+    {"uuid4",          0, SQLITE_UTF8, uuid4func},
+    {"uuid5",          2, SQLITE_UTF8, uuid5func},
+    {"uuid_nil",       0, SQLITE_UTF8, uuid_nil},
+    {"uuid_ns_dns",    0, SQLITE_UTF8, uuid_ns_dns},
+    {"uuid_ns_oid",    0, SQLITE_UTF8, uuid_ns_oid},
+    {"uuid_ns_url",    0, SQLITE_UTF8, uuid_ns_url},
+    {"uuid_ns_x500",   0, SQLITE_UTF8, uuid_ns_x500},
+    {"uuid_to_string", 1, SQLITE_UTF8, uuid_to_string_func},
+    {"uuid_to_blob",   1, SQLITE_UTF8, uuid_to_blob_func},
   };
 
   int rc = SQLITE_OK;
