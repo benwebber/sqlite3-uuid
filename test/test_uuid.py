@@ -119,3 +119,18 @@ def test_uuid_ns_x500(db):
     result = query(db, 'SELECT uuid_ns_x500();')
     u = uuid.UUID(result)
     assert u == uuid.NAMESPACE_X500
+
+
+def test_uuid_to_string(db, uuid5_examples):
+    db.text_factory = str
+    for _, expected in uuid5_examples:
+        result = query(db, 'SELECT uuid_to_string(?);', (expected.bytes,))
+        u = uuid.UUID(result)
+        assert u == expected
+
+
+def test_uuid_to_blob(db, uuid5_examples):
+    for _, expected in uuid5_examples:
+        result = query(db, 'SELECT uuid_to_blob(?);', (str(expected),))
+        u = uuid.UUID(bytes=result)
+        assert u == expected
