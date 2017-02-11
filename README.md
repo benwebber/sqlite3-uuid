@@ -118,6 +118,29 @@ SELECT uuid_ns_x500();
 6ba7b814-9dad-11d1-80b4-00c04fd430c8
 ```
 
+### Converting between types
+
+#### `uuid_to_blob()`
+
+Convert a TEXT UUID to a 16-byte BLOB.
+
+```
+sqlite3 -cmd '.load uuid' uuid.db 'SELECT uuid_to_blob("3dfe5c62-e543-46ff-a2e0-0b1017506be0");' |
+  tr -d '\n' |
+  hexdump -C
+00000000  3d fe 5c 62 e5 43 46 ff  a2 e0 0b 10 17 50 6b e0  |=.\b.CF......Pk.|
+00000010
+```
+
+### `uuid_to_text()`
+
+Convert a 16-byte BLOB to a TEXT UUID.
+
+```
+SELECT uuid_to_text(uuid_to_blob('3dfe5c62-e543-46ff-a2e0-0b1017506be0'));
+3dfe5c62-e543-46ff-a2e0-0b1017506be0
+```
+
 ## Notes
 
 This extension only supports Linux and Mac OS X at the moment.
