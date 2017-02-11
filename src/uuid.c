@@ -32,7 +32,6 @@ SQLITE_EXTENSION_INIT1
 #define SET_VERSION(uu, version)  (uu[6] = (uu[6] & 0x0f) | (version << 4))
 
 #define UUID_LENGTH  36
-#define UUID_SIZE    16
 
 /*
 ** Implementation of uuid1() function.
@@ -75,14 +74,14 @@ static void uuid3func(
   MD5_CTX mdctx;
   unsigned char md_value[MD5_DIGEST_LENGTH];
   MD5_Init(&mdctx);
-  MD5_Update(&mdctx, namespace_uuid, UUID_SIZE);
+  MD5_Update(&mdctx, namespace_uuid, sizeof(uuid_t));
   MD5_Update(&mdctx, name, strlen((const char *)name));
   MD5_Final(md_value, &mdctx);
 
   SET_VARIANT(md_value);
   SET_VERSION(md_value, 3);
 
-  memcpy(uu, md_value, UUID_SIZE);
+  memcpy(uu, md_value, sizeof(uuid_t));
 
   uuid_unparse_lower(uu, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
@@ -129,14 +128,14 @@ static void uuid5func(
   SHA_CTX mdctx;
   unsigned char md_value[SHA_DIGEST_LENGTH];
   SHA1_Init(&mdctx);
-  SHA1_Update(&mdctx, namespace_uuid, UUID_SIZE);
+  SHA1_Update(&mdctx, namespace_uuid, sizeof(uuid_t));
   SHA1_Update(&mdctx, name, strlen((const char *)name));
   SHA1_Final(md_value, &mdctx);
 
   SET_VARIANT(md_value);
   SET_VERSION(md_value, 5);
 
-  memcpy(uu, md_value, UUID_SIZE);
+  memcpy(uu, md_value, sizeof(uuid_t));
 
   uuid_unparse_lower(uu, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
@@ -194,7 +193,7 @@ static void uuid_to_string_func(
 ){
   assert(argc==1);
   const void *uuid_bytes = sqlite3_value_blob(argv[0]);
-  if(sqlite3_value_bytes(argv[0]) != UUID_SIZE) {
+  if(sqlite3_value_bytes(argv[0]) != sizeof(uuid_t)) {
     sqlite3_result_error(context, "invalid uuid bytes", -1);
     return;
   }
@@ -215,7 +214,7 @@ static void uuid_to_blob_func(
     sqlite3_result_error(context, "invalid uuid", -1);
     return;
   }
-  sqlite3_result_blob(context, uuid, UUID_SIZE, SQLITE_TRANSIENT);
+  sqlite3_result_blob(context, uuid, sizeof(uuid_t), SQLITE_TRANSIENT);
 }
 
 /*
