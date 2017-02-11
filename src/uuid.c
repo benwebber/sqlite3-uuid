@@ -33,11 +33,13 @@ SQLITE_EXTENSION_INIT1
 
 #define UUID_LENGTH  36
 
-static const uuid_string_t NAMESPACE_DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
-static const uuid_string_t NAMESPACE_OID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8";
-static const uuid_string_t NAMESPACE_URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
-static const uuid_string_t NAMESPACE_X500 = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
-static const uuid_string_t NIL_UUID = "00000000-0000-0000-0000-000000000000";
+typedef char _uuid_string_t[37];
+
+static const _uuid_string_t NAMESPACE_DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+static const _uuid_string_t NAMESPACE_OID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8";
+static const _uuid_string_t NAMESPACE_URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
+static const _uuid_string_t NAMESPACE_X500 = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
+static const _uuid_string_t NIL_UUID = "00000000-0000-0000-0000-000000000000";
 
 /*
 ** Implementation of uuid1() function.
@@ -50,7 +52,7 @@ static void uuid1(
   assert(argc==0);
   uuid_t uuid;
   uuid_generate_time(uuid);
-  uuid_string_t uuid_str;
+  _uuid_string_t uuid_str;
   uuid_unparse_lower(uuid, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
@@ -65,7 +67,7 @@ static void uuid3(
 ){
   assert(argc==2);
   uuid_t namespace_uuid;
-  uuid_string_t uuid_str;
+  _uuid_string_t uuid_str;
 
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
@@ -104,7 +106,7 @@ static void uuid4(
   assert(argc==0);
   uuid_t uuid;
   uuid_generate_random(uuid);
-  uuid_string_t uuid_str;
+  _uuid_string_t uuid_str;
   uuid_unparse_lower(uuid, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
@@ -119,7 +121,7 @@ static void uuid5(
 ){
   assert(argc==2);
   uuid_t namespace_uuid;
-  uuid_string_t uuid_str;
+  _uuid_string_t uuid_str;
 
   const unsigned char *namespace = sqlite3_value_text(argv[0]);
   const unsigned char *name      = sqlite3_value_text(argv[1]);
@@ -203,7 +205,7 @@ static void uuid_to_text(
     sqlite3_result_error(context, "UUID must be 16 bytes", -1);
     return;
   }
-  uuid_string_t uuid_str;
+  _uuid_string_t uuid_str;
   uuid_unparse_lower(*(uuid_t *)uuid_bytes, uuid_str);
   sqlite3_result_text(context, uuid_str, UUID_LENGTH, SQLITE_TRANSIENT);
 }
