@@ -33,6 +33,12 @@ SQLITE_EXTENSION_INIT1
 
 #define UUID_LENGTH  36
 
+static const uuid_string_t NAMESPACE_DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+static const uuid_string_t NAMESPACE_OID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8";
+static const uuid_string_t NAMESPACE_URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
+static const uuid_string_t NAMESPACE_X500 = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
+static const uuid_string_t NIL_UUID = "00000000-0000-0000-0000-000000000000";
+
 /*
 ** Implementation of uuid1() function.
 */
@@ -147,7 +153,7 @@ static void uuid_nil(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "00000000-0000-0000-0000-000000000000", UUID_LENGTH, SQLITE_STATIC);
+  sqlite3_result_text(context, NIL_UUID, UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_dns(
@@ -156,7 +162,7 @@ static void uuid_ns_dns(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b810-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
+  sqlite3_result_text(context, NAMESPACE_DNS, UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_oid(
@@ -165,7 +171,7 @@ static void uuid_ns_oid(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b812-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
+  sqlite3_result_text(context, NAMESPACE_OID, UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_url(
@@ -174,7 +180,7 @@ static void uuid_ns_url(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b811-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
+  sqlite3_result_text(context, NAMESPACE_URL, UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_ns_x500(
@@ -183,7 +189,7 @@ static void uuid_ns_x500(
   sqlite3_value **argv
 ){
   assert(argc==0);
-  sqlite3_result_text(context, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", UUID_LENGTH, SQLITE_STATIC);
+  sqlite3_result_text(context, NAMESPACE_X500, UUID_LENGTH, SQLITE_STATIC);
 }
 
 static void uuid_to_string_func(
