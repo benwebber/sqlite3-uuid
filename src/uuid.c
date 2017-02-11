@@ -71,7 +71,7 @@ static void uuid3(
   const unsigned char *name      = sqlite3_value_text(argv[1]);
 
   if(uuid_parse((const char *)namespace, namespace_uuid) == -1) {
-    sqlite3_result_error(context, "invalid uuid", -1);
+    sqlite3_result_error(context, "cannot parse namespace UUID", -1);
     return;
   }
 
@@ -125,7 +125,7 @@ static void uuid5(
   const unsigned char *name      = sqlite3_value_text(argv[1]);
 
   if(uuid_parse((const char *)namespace, namespace_uuid) == -1) {
-    sqlite3_result_error(context, "invalid uuid", -1);
+    sqlite3_result_error(context, "cannot parse namespace UUID", -1);
     return;
   }
 
@@ -200,7 +200,7 @@ static void uuid_to_text(
   assert(argc==1);
   const void *uuid_bytes = sqlite3_value_blob(argv[0]);
   if(sqlite3_value_bytes(argv[0]) != sizeof(uuid_t)) {
-    sqlite3_result_error(context, "invalid uuid bytes", -1);
+    sqlite3_result_error(context, "UUID must be 16 bytes", -1);
     return;
   }
   uuid_string_t uuid_str;
@@ -217,7 +217,7 @@ static void uuid_to_blob(
   uuid_t uuid;
   const unsigned char *uuid_str	= sqlite3_value_text(argv[0]);
   if(uuid_parse((const char *)uuid_str, uuid) == -1) {
-    sqlite3_result_error(context, "invalid uuid", -1);
+    sqlite3_result_error(context, "cannot parse UUID", -1);
     return;
   }
   sqlite3_result_blob(context, uuid, sizeof(uuid_t), SQLITE_TRANSIENT);
