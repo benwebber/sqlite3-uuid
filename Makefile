@@ -11,10 +11,12 @@ SOURCES  := $(wildcard src/*.c)
 ifeq ($(PLATFORM),Darwin)
 	SO_EXT           = dylib
 	USE_COMMONCRYPTO = implicit
+	LIB             := $(DIST_DIR)/$(NAME).$(VERSION).$(SO_EXT)
 else
 	SO_EXT      = so
 	USE_OPENSSL = implicit
 	LDFLAGS    += -luuid
+	LIB        := $(DIST_DIR)/$(NAME).$(SO_EXT).$(VERSION)
 endif
 
 ifneq ($(USE_OPENSSL),)
@@ -24,8 +26,6 @@ endif
 ifneq ($(USE_COMMONCRYPTO),)
 CFLAGS += -DUSE_COMMONCRYPTO
 endif
-
-LIB := $(DIST_DIR)/$(NAME)-$(VERSION).$(SO_EXT)
 
 all: $(LIB)
 
