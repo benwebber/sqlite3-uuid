@@ -28,6 +28,12 @@ SQLITE_EXTENSION_INIT1
 #include <CommonCrypto/CommonDigest.h>
 #endif
 
+#ifdef USE_DEFAULT_ENTRY_POINT
+#define ENTRY_POINT sqlite3_extension_init
+#else
+#define ENTRY_POINT sqlite3_uuid_init
+#endif
+
 #define SET_VARIANT(uu)           (uu[8] = (uu[8] & 0xbf) | 0x80)
 #define SET_VERSION(uu, version)  (uu[6] = (uu[6] & 0x0f) | (version << 4))
 
@@ -266,7 +272,7 @@ static int register_uuid_functions(sqlite3 *db) {
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
-int sqlite3_uuid_init(
+int ENTRY_POINT(
   sqlite3 *db,
   char **pzErrMsg,
   const sqlite3_api_routines *pApi

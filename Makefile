@@ -27,6 +27,10 @@ ifneq ($(USE_COMMONCRYPTO),)
 CFLAGS += -DUSE_COMMONCRYPTO
 endif
 
+ifneq ($(USE_DEFAULT_ENTRY_POINT),)
+CFLAGS += -DUSE_DEFAULT_ENTRY_POINT
+endif
+
 all: $(LIB)
 
 clean:
