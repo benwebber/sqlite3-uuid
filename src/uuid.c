@@ -192,7 +192,7 @@ static void uuid_ns_x500(
   sqlite3_result_text(context, NAMESPACE_X500, UUID_LENGTH, SQLITE_STATIC);
 }
 
-static void uuid_to_string(
+static void uuid_to_text(
   sqlite3_context *context,
   int argc,
   sqlite3_value **argv
@@ -244,7 +244,7 @@ static int register_uuid_functions(sqlite3 *db) {
     {"uuid_ns_oid",    0, SQLITE_UTF8, uuid_ns_oid},
     {"uuid_ns_url",    0, SQLITE_UTF8, uuid_ns_url},
     {"uuid_ns_x500",   0, SQLITE_UTF8, uuid_ns_x500},
-    {"uuid_to_string", 1, SQLITE_UTF8, uuid_to_string},
+    {"uuid_to_text",   1, SQLITE_UTF8, uuid_to_text},
     {"uuid_to_blob",   1, SQLITE_UTF8, uuid_to_blob},
   };
 

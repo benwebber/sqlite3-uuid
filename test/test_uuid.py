@@ -121,10 +121,10 @@ def test_uuid_ns_x500(db):
     assert u == uuid.NAMESPACE_X500
 
 
-def test_uuid_to_string(db, uuid5_examples):
+def test_uuid_to_text(db, uuid5_examples):
     db.text_factory = str
     for _, expected in uuid5_examples:
-        result = query(db, 'SELECT uuid_to_string(?);', (expected.bytes,))
+        result = query(db, 'SELECT uuid_to_text(?);', (expected.bytes,))
         u = uuid.UUID(result)
         assert u == expected
 
