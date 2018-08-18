@@ -4,56 +4,12 @@
 sqlite-uuid test suite
 """
 
-import collections
 import uuid
-
-try:
-    from pysqlite2 import dbapi2 as sqlite3
-except ImportError:
-    import sqlite3
-
-import pytest
-
-
-NamespaceExample = collections.namedtuple('NamespaceExample', ['namespace', 'name'])
-
-
-@pytest.fixture
-def db(extension):
-    conn = sqlite3.connect(':memory:')
-    conn.enable_load_extension(True)
-    conn.load_extension(extension)
-    conn.enable_load_extension(False)
-    return conn
-
-
-@pytest.fixture
-def examples():
-    return [
-        NamespaceExample(uuid.NAMESPACE_DNS, 'example.org'),
-        NamespaceExample(uuid.NAMESPACE_DNS, 'www.example.org'),
-        NamespaceExample(uuid.NAMESPACE_OID, '0.1.2.3'),
-        NamespaceExample(uuid.NAMESPACE_OID, '0.1.2.3.4'),
-        NamespaceExample(uuid.NAMESPACE_URL, 'https://example.org'),
-        NamespaceExample(uuid.NAMESPACE_URL, 'https://www.example.org'),
-        NamespaceExample(uuid.NAMESPACE_X500, 'cn=www.example.org,ou=Technology,o=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US'),
-    ]
-
-
-@pytest.fixture
-def uuid3_examples(examples):
-    return [((str(e.namespace), e.name), uuid.uuid3(e.namespace, e.name))
-            for e in examples]
-
-
-@pytest.fixture
-def uuid5_examples(examples):
-    return [((str(e.namespace), e.name), uuid.uuid5(e.namespace, e.name))
-            for e in examples]
 
 
 def query(db, *args):
-    return db.execute(*args).fetchone()[0]
+    with db:
+        return db.cursor().execute(*args).fetchone()[0]
 
 
 def test_uuid1(db):
@@ -122,7 +78,6 @@ def test_uuid_ns_x500(db):
 
 
 def test_uuid_to_text(db, uuid5_examples):
-    db.text_factory = str
     for _, expected in uuid5_examples:
         result = query(db, 'SELECT uuid_to_text(?);', (expected.bytes,))
         u = uuid.UUID(result)

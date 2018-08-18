@@ -1,6 +1,7 @@
 # sqlite3-uuid
 
 [![Build Status](https://travis-ci.org/benwebber/sqlite3-uuid.svg?branch=master)](https://travis-ci.org/benwebber/sqlite3-uuid)
+[![codecov](https://codecov.io/gh/benwebber/sqlite3-uuid/branch/master/graph/badge.svg)](https://codecov.io/gh/benwebber/sqlite3-uuid)
 
 This SQLite extension implements functions for creating [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt) compliant UUIDs.
 

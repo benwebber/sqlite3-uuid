@@ -31,16 +31,21 @@ ifneq ($(USE_DEFAULT_ENTRY_POINT),)
 CFLAGS += -DUSE_DEFAULT_ENTRY_POINT
 endif
 
+ifneq ($(DEBUG),)
+CFLAGS += --coverage
+endif
+
 all: $(LIB)
 
 clean:
 	$(RM) -r $(DIST_DIR)
+	$(RM) *.gcda *.gcno *.gcov
 
 print-%:
 	@echo '$*=$($*)'
 
 test: $(LIB)
-	py.test --ignore venv --extension=$(LIB)
+	tox -- --extension=$(LIB)
 
 $(LIB): $(SOURCES)
 	mkdir -p $(DIST_DIR)
