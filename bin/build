@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET=$1
+REF=${2:-dev}
+VERSION=${REF#refs/tags/}
+
+NAME="sqlite3-uuid"
+
+case "$TARGET" in
+    *linux*)
+        sudo apt-get install -y gcc libssl-dev uuid-dev
+        ;;
+esac
+
+make RELEASE=1
+
+LIB=$(make -s print-LIB RELEASE=1 | cut -d= -f2)
+
+tar czf "${NAME}-${VERSION}-${TARGET}.tar.gz" -C dist "$(basename "$LIB")"

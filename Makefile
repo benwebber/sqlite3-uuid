@@ -12,9 +12,13 @@ ifeq ($(PLATFORM),Darwin)
 	SO_EXT           = dylib
 	USE_COMMONCRYPTO = implicit
 	LIB             := $(DIST_DIR)/$(NAME).$(VERSION).$(SO_EXT)
+ifeq ($(RELEASE),1)
+	LDFLAGS         += -undefined dynamic_lookup
+else
 	SQLITE_PREFIX   ?= $(shell brew --prefix sqlite)
 	CFLAGS          += -I$(SQLITE_PREFIX)/include
 	LDFLAGS         += -L$(SQLITE_PREFIX)/lib -lsqlite3
+endif
 else
 	SO_EXT      = so
 	USE_OPENSSL = implicit
