@@ -29,7 +29,7 @@ jobs:
 
       - name: Coverage
         if: runner.os == 'Linux'
-        run: gcov src/uuid.c
+        run: gcov -o dist src/uuid.c
 
       - name: Upload coverage
         if: runner.os == 'Linux'

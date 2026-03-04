@@ -32,14 +32,15 @@ CFLAGS += -DUSE_DEFAULT_ENTRY_POINT
 endif
 
 ifneq ($(DEBUG),)
-CFLAGS += --coverage
+CFLAGS  += --coverage
+LDFLAGS += --coverage
 endif
 
 all: $(LIB)
 
 clean:
 	$(RM) -r $(DIST_DIR)
-	$(RM) *.gcda *.gcno *.gcov
+	$(RM) *.gcov
 
 print-%:
 	@echo '$*=$($*)'
@@ -47,6 +48,9 @@ print-%:
 test: $(LIB)
 	uv run --group test pytest --verbose --extension=$(LIB)
 
-$(LIB): $(SOURCES)
+$(LIB): $(DIST_DIR)/uuid.o
+	$(CC) $< $(LDFLAGS) -o $@
+
+$(DIST_DIR)/uuid.o: $(SOURCES)
 	mkdir -p $(DIST_DIR)
-	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
