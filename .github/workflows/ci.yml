@@ -17,9 +17,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install system dependencies
+      - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get install -y gcc libssl-dev libsqlite3-dev uuid-dev
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install sqlite
 
       - name: Build
         run: make DEBUG=1

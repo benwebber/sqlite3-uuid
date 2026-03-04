@@ -11,8 +11,10 @@ SOURCES  := $(wildcard src/*.c)
 ifeq ($(PLATFORM),Darwin)
 	SO_EXT           = dylib
 	USE_COMMONCRYPTO = implicit
-	LDFLAGS         += -undefined dynamic_lookup
 	LIB             := $(DIST_DIR)/$(NAME).$(VERSION).$(SO_EXT)
+	SQLITE_PREFIX   ?= $(shell brew --prefix sqlite)
+	CFLAGS          += -I$(SQLITE_PREFIX)/include
+	LDFLAGS         += -L$(SQLITE_PREFIX)/lib -lsqlite3
 else
 	SO_EXT      = so
 	USE_OPENSSL = implicit
