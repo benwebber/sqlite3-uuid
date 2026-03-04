@@ -1,0 +1,39 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y gcc libssl-dev libsqlite3-dev uuid-dev
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Build
+        run: make DEBUG=1
+
+      - name: Test
+        run: make test USE_DEFAULT_ENTRY_POINT=1
+
+      - name: Coverage
+        if: runner.os == 'Linux'
+        run: gcov src/uuid.c
+
+      - name: Upload coverage
+        if: runner.os == 'Linux'
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
