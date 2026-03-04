@@ -1,6 +1,5 @@
 # sqlite3-uuid
 
-[![Build Status](https://travis-ci.org/benwebber/sqlite3-uuid.svg?branch=master)](https://travis-ci.org/benwebber/sqlite3-uuid)
 [![codecov](https://codecov.io/gh/benwebber/sqlite3-uuid/branch/master/graph/badge.svg)](https://codecov.io/gh/benwebber/sqlite3-uuid)
 
 This SQLite extension implements functions for creating [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt) compliant UUIDs.
@@ -27,7 +26,7 @@ This SQLite extension implements functions for creating [RFC 4122](https://www.i
     make
     ```
 
-2. Load the extension using your SQLite API of choice. For example, in Python,
+3. Load the extension using your SQLite API of choice. For example, in Python,
 
     ```python
     import sqlite3
@@ -76,7 +75,7 @@ SELECT uuid4();
 Generate a version 5 (SHA1) namespace UUID.
 
 ```
-SELECT uuid3(uuid_ns_dns(), 'example.org');
+SELECT uuid5(uuid_ns_dns(), 'example.org');
 aad03681-8b63-5304-89e0-8ca8f49461b5
 ```
 
@@ -133,7 +132,7 @@ sqlite3 -cmd '.load uuid' uuid.db 'SELECT uuid_to_blob("3dfe5c62-e543-46ff-a2e0-
 00000010
 ```
 
-### `uuid_to_text()`
+#### `uuid_to_text()`
 
 Convert a 16-byte BLOB to a TEXT UUID.
 
