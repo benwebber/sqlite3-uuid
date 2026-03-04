@@ -1,0 +1,7 @@
+[project]
+name = "sqlite3-uuid"
+version = "0.0.0"
+requires-python = ">=3.12"
+
+[dependency-groups]
+test = ["apsw", "pytest"]

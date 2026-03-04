@@ -45,7 +45,7 @@ print-%:
 	@echo '$*=$($*)'
 
 test: $(LIB)
-	tox -- --extension=$(LIB)
+	uv run --group test pytest --verbose --extension=$(LIB)
 
 $(LIB): $(SOURCES)
 	mkdir -p $(DIST_DIR)
