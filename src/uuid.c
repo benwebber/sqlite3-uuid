@@ -19,13 +19,51 @@ SQLITE_EXTENSION_INIT1
 #include <string.h>
 
 #ifdef USE_OPENSSL
-#include <openssl/md5.h>
-#include <openssl/sha.h>
+#include <openssl/evp.h>
+
+static void digest_md5(const void *a, size_t alen, const void *b, size_t blen, unsigned char out[16]) {
+  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+  unsigned int len;
+  EVP_DigestInit_ex(ctx, EVP_md5(), NULL);
+  EVP_DigestUpdate(ctx, a, alen);
+  EVP_DigestUpdate(ctx, b, blen);
+  EVP_DigestFinal_ex(ctx, out, &len);
+  EVP_MD_CTX_free(ctx);
+}
+
+static void digest_sha1(const void *a, size_t alen, const void *b, size_t blen, unsigned char out[20]) {
+  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+  unsigned int len;
+  EVP_DigestInit_ex(ctx, EVP_sha1(), NULL);
+  EVP_DigestUpdate(ctx, a, alen);
+  EVP_DigestUpdate(ctx, b, blen);
+  EVP_DigestFinal_ex(ctx, out, &len);
+  EVP_MD_CTX_free(ctx);
+}
 #endif
 
 #ifdef USE_COMMONCRYPTO
 #define COMMON_DIGEST_FOR_OPENSSL
 #include <CommonCrypto/CommonDigest.h>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+static void digest_md5(const void *a, size_t alen, const void *b, size_t blen, unsigned char out[16]) {
+  MD5_CTX ctx;
+  MD5_Init(&ctx);
+  MD5_Update(&ctx, a, alen);
+  MD5_Update(&ctx, b, blen);
+  MD5_Final(out, &ctx);
+}
+
+static void digest_sha1(const void *a, size_t alen, const void *b, size_t blen, unsigned char out[20]) {
+  SHA_CTX ctx;
+  SHA1_Init(&ctx);
+  SHA1_Update(&ctx, a, alen);
+  SHA1_Update(&ctx, b, blen);
+  SHA1_Final(out, &ctx);
+}
+#pragma clang diagnostic pop
 #endif
 
 #ifdef USE_DEFAULT_ENTRY_POINT
@@ -85,12 +123,8 @@ static void uuid3(
 
   uuid_t uu;
 
-  MD5_CTX mdctx;
-  unsigned char md_value[MD5_DIGEST_LENGTH];
-  MD5_Init(&mdctx);
-  MD5_Update(&mdctx, namespace_uuid, sizeof(uuid_t));
-  MD5_Update(&mdctx, name, strlen((const char *)name));
-  MD5_Final(md_value, &mdctx);
+  unsigned char md_value[16];
+  digest_md5(namespace_uuid, sizeof(uuid_t), name, strlen((const char *)name), md_value);
 
   SET_VARIANT(md_value);
   SET_VERSION(md_value, 3);
@@ -139,12 +173,8 @@ static void uuid5(
 
   uuid_t uu;
 
-  SHA_CTX mdctx;
-  unsigned char md_value[SHA_DIGEST_LENGTH];
-  SHA1_Init(&mdctx);
-  SHA1_Update(&mdctx, namespace_uuid, sizeof(uuid_t));
-  SHA1_Update(&mdctx, name, strlen((const char *)name));
-  SHA1_Final(md_value, &mdctx);
+  unsigned char md_value[20];
+  digest_sha1(namespace_uuid, sizeof(uuid_t), name, strlen((const char *)name), md_value);
 
   SET_VARIANT(md_value);
   SET_VERSION(md_value, 5);
