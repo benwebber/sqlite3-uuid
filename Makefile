@@ -11,6 +11,7 @@ SOURCES  := $(wildcard src/*.c)
 ifeq ($(PLATFORM),Darwin)
 	SO_EXT           = dylib
 	USE_COMMONCRYPTO = implicit
+	LDFLAGS         += -undefined dynamic_lookup
 	LIB             := $(DIST_DIR)/$(NAME).$(VERSION).$(SO_EXT)
 else
 	SO_EXT      = so
